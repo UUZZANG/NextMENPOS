@@ -1,37 +1,27 @@
 // ignore_for_file: avoid_print, prefer_interpolation_to_compose_strings
 
-import 'dart:async';
+import 'package:enpos_app/menu_layout.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:enpos_app/menu_layout.dart';   
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 
-
- 
-          
-void main() async {	
-  	await dotenv.load(fileName: '.env');
-  	print(dotenv.env['BASEURL']);
-	runApp(const MyApp());                  
-	
+void main() async {
+  await dotenv.load(fileName: '.env');
+  print(dotenv.env['BASEURL']);
+  runApp(const MyApp());
 }
-        
- 
+
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
-	const MyApp({super.key});
-
-	@override
-	Widget build(BuildContext context) {
-
-		return const MaterialApp(
-      debugShowCheckedModeBanner: false,  
-			home: LoginPage(),     
-			
-		);
-	}
-
+  @override
+  Widget build(BuildContext context) {
+    return const MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: LoginPage(),
+    );
+  }
 }
 
 class LoginPage extends StatefulWidget {
@@ -42,8 +32,9 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  var usernameController = TextEditingController(); 
-  var passwordController = TextEditingController(); 
+  var usernameController = TextEditingController();
+  var passwordController = TextEditingController();
+
   // TextField(
   // controller: idController,
   // decoration: InputDecoration(labelText: "id"),
@@ -53,10 +44,9 @@ class _LoginPageState extends State<LoginPage> {
   //   decoration: InputDecoration(labelText: "password"),
   // ),
 
-  static final storage =  FlutterSecureStorage(); 
-	dynamic userInfo = ''; 
-  
- 
+  static const storage = FlutterSecureStorage();
+  dynamic userInfo = '';
+
   @override
   void initState() {
     super.initState();
@@ -66,92 +56,82 @@ class _LoginPageState extends State<LoginPage> {
     });
   }
 
-  _asyncMethod() async {  
-    userInfo = await storage.read(key: "id")?? '';
-    
-    setState( () {
+  _asyncMethod() async {
+    userInfo = await storage.read(key: "id") ?? '';
+
+    setState(() {
       print('State Changed');
     });
-    if (userInfo != null) {      
-      Navigator.of(context).push(MaterialPageRoute(builder: (context) => MenuLayout(id: userInfo)));
+    if (userInfo != null) {
+      Navigator.of(context).push(
+          MaterialPageRoute(builder: (context) => MenuLayout(id: userInfo)));
     } else {
       print('login required!');
     }
   }
-	
-	// Login Action
-  	loginAction(accountName, password) async {
-        
-		print('id :'+ accountName);
 
-		Map params = { 'userId' : '$accountName', 'password' : '$password'};    		
+  // Login Action
+  loginAction(accountName, password) async {
+    print('id :' + accountName);
 
-		// 프록시 거치는 로그인은 앱에서만 가능한 듯
-		// 웹 서비스는 CORS 설정 , 토큰으로 보안 해야 함	
-		final res = await http
-			.get(Uri.parse('https://corsproxy.github.io/${dotenv.env['BASEURL']}/auth/login'));
-			//{"pin":"RSMEDUCO","emailid":"jump502@samsung.com","name":"부품대리점","phone1":"043-000-0000","phone2":null,"useflag":"Y","usertype":"V","wgid":4,"companyId":"RSMEDUCO"}
-			// final List<Notice> result = jsonDecode(utf8.decode(response.bodyBytes)) //jsonDecode(response.body)
-			// 	.map<Notice>((json) => Notice.fromJson(json))
-			// 	.toList();
-		if (res.statusCode == 200) {
-			print('접속 성공!'+ res.body);
-				// final jsonBody = json.decode(res.data['pin'].toString());					
-				// var val = jsonEncode(Login('$accountName', '$password', '$jsonBody'));							
-				await storage.write(
-					key		: "id",
-					value	: res.statusCode.toString() 
-				);
-				return true;
-				//return true;
-	 	} else {
-	 		print('error');
-	 		await storage.write(
-					key		: "id",
-					value	: "RSMEDUCO"
-				);
-			return true;
-	 	}
-    
+    Map params = {'userId': '$accountName', 'password': '$password'};
 
+    // 프록시 거치는 로그인은 앱에서만 가능한 듯
+    // 웹 서비스는 CORS 설정 , 토큰으로 보안 해야 함
+    final res = await http.get(Uri.parse(
+        'https://corsproxy.github.io/${dotenv.env['BASEURL']}/auth/login'));
+    //{"pin":"RSMEDUCO","emailid":"jump502@samsung.com","name":"부품대리점","phone1":"043-000-0000","phone2":null,"useflag":"Y","usertype":"V","wgid":4,"companyId":"RSMEDUCO"}
+    // final List<Notice> result = jsonDecode(utf8.decode(response.bodyBytes)) //jsonDecode(response.body)
+    // 	.map<Notice>((json) => Notice.fromJson(json))
+    // 	.toList();
+    if (res.statusCode == 200) {
+      print('접속 성공!' + res.body);
+      // final jsonBody = json.decode(res.data['pin'].toString());
+      // var val = jsonEncode(Login('$accountName', '$password', '$jsonBody'));
+      await storage.write(key: "id", value: res.statusCode.toString());
+      return true;
+      //return true;
+    } else {
+      print('error');
+      await storage.write(key: "id", value: "RSMEDUCO");
+      return true;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: Column(
-	        children: [
-					
-	          TextField(
-	            controller: usernameController,
-	            decoration: InputDecoration(
-	              labelText: 'Username',
-	            ),
-	          ),
-						
-	          TextField(
-	            controller: passwordController,
-	            decoration: InputDecoration(
-	              labelText: 'Password',
-	            ),
-	          ),
-						
-	          ElevatedButton(
-	            onPressed: () async {
-	              if (await loginAction(usernameController.text, passwordController.text) ==
-	                  true) {	                
-	                  Navigator.of(context).push(MaterialPageRoute(builder: (context) => MenuLayout(id : userInfo)));
-	              } else {
-	                print('로그인 실패');
-	              }
-	            },
-	            child: Text('Login'),
-	          ),
-	        ],
-       ),
+      body: Column(
+        children: [
+          TextField(
+            controller: usernameController,
+            decoration: const InputDecoration(
+              labelText: 'Username',
+            ),
+          ),
+          TextField(
+            controller: passwordController,
+            decoration: const InputDecoration(
+              labelText: 'Password',
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              if (await loginAction(
+                      usernameController.text, passwordController.text) ==
+                  true) {
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => MenuLayout(id: userInfo)));
+              } else {
+                print('로그인 실패');
+              }
+            },
+            child: const Text('Login'),
+          ),
+        ],
+      ),
     );
   }
-
 }
 // class MyScreen extends StatefulWidget {
 //   const MyScreen({Key? key}) : super(key: key);
@@ -159,7 +139,6 @@ class _LoginPageState extends State<LoginPage> {
 //   @override
 //   State<MyScreen> createState() => _MyScreenState();
 // }
-
 
 // class _MyScreenState extends State<MyScreen> {
 //   @override
@@ -183,7 +162,7 @@ class _LoginPageState extends State<LoginPage> {
 //             tabs: const [
 //               Tab(
 //                 icon: Icon(Icons.shopping_cart),
-//                 text: '쇼핑하기',                
+//                 text: '쇼핑하기',
 //               ),
 //               Tab(
 //                 icon: Icon(Icons.search),
@@ -298,6 +277,5 @@ class _LoginPageState extends State<LoginPage> {
 //       ),
 //     );
 
-    
 //   }
 //}
