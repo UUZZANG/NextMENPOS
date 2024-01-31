@@ -59,8 +59,10 @@ class _MainPageState extends State<MainPage> {
   // 로그인 정보 있는지 확인 후 없으면 로그인 아니면 홈으로 이동
   _checkLogin() async {
     dynamic storedId = await storage.read(key: "id") ?? '';
+    dynamic storedToken = await storage.read(key: "authToken") ?? '';
+    print ('storedId' +storedId);
     setState(() {});
-    if (storedId != null) {
+    if (storedId != '') {
       Navigator.of(context).push(
           MaterialPageRoute(builder: (context) => MenuLayout(id: storedId)));
     } else {
@@ -70,8 +72,6 @@ class _MainPageState extends State<MainPage> {
 
   // Login Action
   loginAction(accountName, password) async {
-    //Map params = { 'userId' : '$accountName', 'password' : '$password'};
-    //Map params = { 'userId' : 'RSMEDUCO', 'password' : '1234'};
 
     final res = await http.post(
         Uri.parse('${dotenv.env['BASEURL']}/auth/login'),
@@ -82,22 +82,30 @@ class _MainPageState extends State<MainPage> {
         });
     // {"isFailed":false,"authToken":"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJSU00iLCJpYXQiOjE3MDU5OTE1MzJ9.7q9L7rozgh_CPdq5ijqI1X8aIxfiqvg3tNc31XmtXsk","message":"로그인 되었습니다."}
 
-    if (res.statusCode == 200) {
-      print('접속 성공!${res.body}');
-      // 로그인 결과 이상이 없는 경우 사용자 정보를 서버로 부터 가져옴
 
-      final res1 = await http.get(
-          Uri.parse(
-              '${dotenv.env['BASEURL']}/auth/userinfo?userId=$accountName'),
-          headers: {"Access-Control-Allow-Origin": "*"});
-      if (res1.statusCode == 200) {
-        // {"pin":"RSMEDUCO","emailid":"jump502@samsung.com","name":"부품대리점","phone1":"043-000-0000","phone2":null,"useflag":"Y","usertype":"V","wgid":4,"companyId":"RSMEDUCO"}
-        print('사용자 정보 성공!' + jsonDecode(res1.body)['pin']);
-        String jsonData = res1.body;
-        var myJson = jsonDecode(jsonData)['pin'];
-        storedId = myJson;
-        await storage.write(key: "id", value: myJson);
-        return true;
+    if (res.statusCode == 200) {
+      if ( jsonDecode(res.body)['isFailed'] == false) {
+
+
+        await storage.write( key: "authToken", value: jsonDecode(res.body)['authToken']);
+
+        // 로그인 결과 이상이 없는 경우 사용자 정보를 서버로 부터 가져옴
+        final res1 = await http.get(
+            Uri.parse(
+                '${dotenv.env['BASEURL']}/auth/userinfo?userId=$accountName'),
+            headers: {"Access-Control-Allow-Origin": "*"});
+
+        if (res1.statusCode == 200) {
+          // {"pin":"RSMEDUCO","emailid":"jump502@samsung.com","name":"부품대리점","phone1":"043-000-0000","phone2":null,"useflag":"Y","usertype":"V","wgid":4,"companyId":"RSMEDUCO"}
+          print('사용자 정보 성공!' + jsonDecode(res1.body)['pin']);
+          String jsonData = res1.body;
+          var myJson = jsonDecode(jsonData)['pin'];
+          storedId = myJson;
+          await storage.write(key: "id", value: myJson);
+          return true;
+        }
+
+
       }
     } else {
       print('접속 실패');
@@ -270,11 +278,12 @@ class _MainPageState extends State<MainPage> {
                         side: const BorderSide(style: BorderStyle.none),
                       ),
                       onPressed: () async {
-                        if (await loginAction(usernameController.text,
-                                passwordController.text) ==
-                            true) {
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) => MenuLayout(id: storedId)));
+                        if (await loginAction(usernameController.text,passwordController.text) == true) {
+
+                            Navigator.of(context).push(MaterialPageRoute(
+                                builder: (context) => MenuLayout(id: storedId)));
+
+
                         } else {
                           print('로그인 실패');
                         }

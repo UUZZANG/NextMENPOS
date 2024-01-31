@@ -7,22 +7,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:provider/provider.dart';
 
+
+
 class MenuLayout extends StatefulWidget {
   String id;
-
   MenuLayout({super.key, required this.id});
-
-  //const MenuLayout({Key? key}) ;
 
   @override
   State<MenuLayout> createState() => _MenuLayoutState(id: id);
 }
 
+
 class _MenuLayoutState extends State<MenuLayout> {
   final storage = const FlutterSecureStorage();
   String id;
-
   _MenuLayoutState({required this.id});
+
 
   @override
   void initState() {
@@ -30,17 +30,20 @@ class _MenuLayoutState extends State<MenuLayout> {
     getInfo();
   }
 
+
   getInfo() async {
     id = (await storage.read(key: 'id'))!;
-    setState(() {});
   }
 
-  // 메뉴 클릭시 바뀌어지는 Body용 위젯
+
   String menuText = "Mobile ENPOS";
-  Widget widgetForBody = ChangeNotifierProvider<NoticeProvider>(
-    create: (context) => NoticeProvider(),
-    child: const NoticeView(),
-  );
+
+  dynamic widgetForBody = ChangeNotifierProvider<NoticeProvider>(
+        create: (context) => NoticeProvider(),
+        child: const NoticeView(),
+        );
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -136,16 +139,16 @@ class _MenuLayoutState extends State<MenuLayout> {
                       color: Colors.grey[850],
                     ),
                     title: const Text('공지사항'),
-                    onTap: () {
-                      setState(() {
-                        menuText = "공지사항";
-                        widgetForBody = ChangeNotifierProvider<NoticeProvider>(
-                          create: (context) => NoticeProvider(),
-                          child: const NoticeView(),
-                        );
-                        Navigator.of(context).pop();
-                      });
-                    },
+                    onTap:  () {
+                        setState(() {
+                            menuText = "공지사항";
+                            widgetForBody =  ChangeNotifierProvider<NoticeProvider>(
+                                               create: (context) => NoticeProvider(),
+                                               child: const NoticeView(),
+                                             );
+                            Navigator.of(context).pop();
+                        });
+                      },
                     //trailing: Icon(Icons.add),
                   ),
                   ListTile(
@@ -169,8 +172,9 @@ class _MenuLayoutState extends State<MenuLayout> {
                       color: Colors.grey[850],
                     ),
                     title: const Text('거래처입고'),
-                    onTap: () {
-                      print('Q&A is clicked');
+                    onTap:
+                        () {
+
                     },
                     //trailing: Icon(Icons.add),
                   ),
@@ -183,10 +187,11 @@ class _MenuLayoutState extends State<MenuLayout> {
                     onTap: () {
                       setState(() {
                         menuText = "입고현황";
-                        widgetForBody = ChangeNotifierProvider<AlbumProvider>(
-                          create: (context) => AlbumProvider(),
-                          child: const AlbumView(),
-                        );
+                        //widgetForBody =  BodyWidget(mid:'1', notifyParent: () { _getNewList('2'); },);
+                        // widgetForBody = ChangeNotifierProvider<AlbumProvider>(
+                        //   create: (context) => AlbumProvider(),
+                        //   child: const AlbumView(),
+                        // );
                         Navigator.of(context).pop();
                       });
                     },
