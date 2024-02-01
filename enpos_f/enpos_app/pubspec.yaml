@@ -49,6 +49,8 @@ dependencies:
   qr_bar_code_scanner_dialog: ^0.0.4
   confirm_dialog: ^1.0.3
   carousel_slider: ^4.2.1
+  flutter_widget_from_html_core: ^0.10.0
+
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.

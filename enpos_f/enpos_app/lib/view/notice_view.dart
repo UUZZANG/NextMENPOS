@@ -1,8 +1,7 @@
 import "package:enpos_app/provider/notice_provider.dart";
 import "package:flutter/material.dart";
-import 'package:intl/intl.dart';
 import "package:provider/provider.dart";
-
+import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import "../model/notice.dart";
 
 ScrollController scrollController = ScrollController();
@@ -25,9 +24,12 @@ class ItemWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
+      color : Colors.white,
+      shape :RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10)),
+
       child: SizedBox(
         height: 100,
-        //width: 100,
         child: Center(child: Text(text, overflow: TextOverflow.ellipsis)),
       ),
     );
@@ -57,7 +59,7 @@ class _NoticeViewState extends State<NoticeView> {
             flexibleSpace:
                   /*********** 검색 날짜 지정 ***********/
                   DropdownButton (
-                      menuMaxHeight : 100.0,
+
                       value: _searchDate,
                       items: _searchDates
                           .map((e) => DropdownMenuItem(
@@ -85,8 +87,7 @@ class _NoticeViewState extends State<NoticeView> {
                     itemBuilder: (context, index) {
                       return InkWell(
                         onTap: () {
-                          _showdialog(context, "${noticeList[index].title}",
-                              "${noticeList[index].content}");
+                          _showdialog(context, noticeList[index]);
                         },
                         child: ListTile(
                           title: Card(
@@ -96,32 +97,7 @@ class _NoticeViewState extends State<NoticeView> {
                           // trailing: Icon(Icons.more_vert),
                           // isThreeLine: true,
                           subtitle: ItemWidget(text: "${noticeList[index].content}"),
-                          //SizedBox(
-                          //height: 100,
-                          //child:
-                          // Column(
-                          //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          //   children: [
 
-                          // Row(children: [
-                          // SizedBox(
-                          //   height: 70,
-                          //   width: 400,
-                          //   child: Center(
-                          //       child: Text("${noticeList[index].content}",
-                          //           overflow: TextOverflow.ellipsis)),
-                          //)
-                          //     ]
-                          // ),
-                          // Row(children: [
-                          //   ItemWidget(
-                          //       text: "test"),
-                          //           //DateFormat("yyyy년 MM월 dd일").format(DateTime.fromMillisecondsSinceEpoch(noticeList[index].title))),
-                          //   const Spacer(),
-                          //   ItemWidget(
-                          //       text: "${noticeList[index].title}")
-                          // ])
-                          //],
                         ),
                       );
                     }
@@ -132,29 +108,49 @@ class _NoticeViewState extends State<NoticeView> {
 
     );
 }
+  /**********************************************************************
+            공지사항 상세 팝업
+            1. 제목
+            2. 내용
+            3. 작성자 작성일자
+            4. 첨부파일
+   **********************************************************************/
 
-  Future<dynamic> _showdialog(
-      BuildContext context, String title, String content) {
-    return showDialog(
-      context: context,
-      builder: (BuildContext context) => AlertDialog(
-        title: Text(title),
-        content: SingleChildScrollView(
-          child: Text(content),
-          // Row(
-          //     children: [
-          //       Text(content),
-          //       //Spacer(),
-          //       //Text( "Update : ${DateFormat("yyyy년 MM월 dd일").format(DateTime.fromMillisecondsSinceEpoch(updateDate as int))}" ),
-          //      // ItemWidget(text: "${noticeList[index].updateUserId}")
-          //     ]
-          //   )
+  Future<dynamic> _showdialog( BuildContext context, Notice notice) {
+      return showDialog(
+        context: context,
+        builder: (BuildContext context) => AlertDialog(
+          title: Text("${notice.title}"),
+          content:
+          Container(
+              color: Colors.transparent,
+              child:
+                  Column(
+                    children: [
+                              Flexible(
+                                flex : 1,
+                                fit : FlexFit.loose,
+                                child:
+                                SizedBox(
+                                    height: 400,
+                                    child: SingleChildScrollView(
+                                        child: HtmlWidget("${notice.content}")
+                                    )
+                                ),
+                              ),
+                              Text("${notice.name}"),
+                              Text("${notice.registerDate}"),
+                              const Divider(color: Colors.black12, thickness: 1.0),
+                              Text("${notice.fileTag}")
+                          ],
+                  )
+
+          ),
+          actions: [
+            ElevatedButton(
+                onPressed: () => Navigator.of(context).pop(), child: const Text('닫기')),
+          ],
         ),
-        actions: [
-          ElevatedButton(
-              onPressed: () => Navigator.of(context).pop(), child: const Text('닫기')),
-        ],
-      ),
-    );
+      );
   }
 }
