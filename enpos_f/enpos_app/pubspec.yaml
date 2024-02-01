@@ -101,12 +101,12 @@ flutter:
   # list giving the asset and other descriptors for the font. For
   # example:
   fonts:
-    - family: RKM KR
+    - family: NouvelR-KR
       fonts:
         - asset: assets/fonts/NouvelR-KR-Light.ttf
         - asset: assets/fonts/NouvelR-KR-Bold.ttf
           style: italic
-    - family: RKM R
+    - family: NouvelR
       fonts:
         - asset: assets/fonts/NouvelR-Light.ttf
         - asset: assets/fonts/NouvelR-Bold.ttf

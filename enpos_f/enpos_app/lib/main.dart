@@ -117,7 +117,7 @@ class _MainPageState extends State<MainPage> {
   Widget build(BuildContext context) {
     return MaterialApp(
         debugShowCheckedModeBanner: false,
-        theme: ThemeData(fontFamily: 'RKM KR'),
+        theme: ThemeData(fontFamily: 'NouvelR-KR'),
         themeMode: ThemeMode.system,
         home: Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),

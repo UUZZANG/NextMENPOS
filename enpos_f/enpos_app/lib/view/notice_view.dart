@@ -25,12 +25,13 @@ class ItemWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       color : Colors.white,
-      shape :RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10)),
+      elevation: 0.0,
+
 
       child: SizedBox(
         height: 100,
-        child: Center(child: Text(text, overflow: TextOverflow.ellipsis)),
+        child: Center(child: Text(text, overflow: TextOverflow.ellipsis
+                                      ,style: TextStyle(fontFamily: 'RKM KR Light', fontWeight: FontWeight.w300))),
       ),
     );
   }
@@ -91,8 +92,11 @@ class _NoticeViewState extends State<NoticeView> {
                         },
                         child: ListTile(
                           title: Card(
+                              color: Colors.amberAccent,
+                              shape :RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(0)),
                               child: Text("${noticeList[index].title}",
-                                  style: const TextStyle(fontSize: 18),
+                                  style: const TextStyle(fontSize: 16),
                                   overflow: TextOverflow.ellipsis)),
                           // trailing: Icon(Icons.more_vert),
                           // isThreeLine: true,
