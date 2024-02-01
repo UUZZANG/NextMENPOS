@@ -5,27 +5,27 @@ import 'package:qr_bar_code_scanner_dialog/qr_bar_code_scanner_dialog.dart';
 
 ScrollController scrollController = ScrollController();
 
-class CenterStorckView extends StatefulWidget {
-  const CenterStorckView({super.key});
+class CustRecvView extends StatefulWidget {
+  const CustRecvView({super.key});
 
   @override
-  State<CenterStorckView> createState() => _CenterStorckViewState();
+  State<CustRecvView> createState() => _CustRecvViewState();
 }
 
 
 /*
   `     # 기존 API 연결 정보
         1. 스캔된 번호로 정보 가져오는 API
-          참고 front js : pages > goods-recv > goods-recv.ts
-          참고 호출 js  : src> providers > goods-recv-data.ts
-                         this.http.get(this.commData.getBaseURL() + '/gr/item?companyId=' + this.commData.getUserInfo().companyId + '&huNo=' + huNo)
+          참고 front js : pages >  cust-recv > cust-recv.ts
+          참고 호출 js  : src> providers > cust-recv-data.ts
+
 
         2. 스캔된 번호로 정보 가져오는 API
 
  */
 
 
-class _CenterStorckViewState extends State<CenterStorckView> {
+class _CustRecvViewState extends State<CustRecvView> {
   final _qrBarCodeScannerDialogPlugin = QrBarCodeScannerDialog();
 
   //임시로 2개 보이기

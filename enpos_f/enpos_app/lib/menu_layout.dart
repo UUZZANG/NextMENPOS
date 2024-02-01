@@ -2,6 +2,7 @@ import 'package:enpos_app/provider/album_provider.dart';
 import 'package:enpos_app/provider/notice_provider.dart';
 import 'package:enpos_app/view/album_view.dart';
 import 'package:enpos_app/view/center_stock.dart';
+import 'package:enpos_app/view/cust_recv.dart';
 import 'package:enpos_app/view/notice_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -149,8 +150,8 @@ class _MenuLayoutState extends State<MenuLayout> {
                             Navigator.of(context).pop();
                         });
                       },
-                    //trailing: Icon(Icons.add),
                   ),
+                  /*********** 센터입고 메뉴  ***********/
                   ListTile(
                     leading: Icon(
                       Icons.add_box,
@@ -164,8 +165,8 @@ class _MenuLayoutState extends State<MenuLayout> {
                         Navigator.of(context).pop();
                       });
                     },
-                    //trailing: Icon(Icons.add),
                   ),
+                  /*********** 거래처입고 메뉴  ***********/
                   ListTile(
                     leading: Icon(
                       Icons.add_business,
@@ -174,10 +175,14 @@ class _MenuLayoutState extends State<MenuLayout> {
                     title: const Text('거래처입고'),
                     onTap:
                         () {
-
+                          setState(() {
+                            menuText = "거래처입고";
+                            widgetForBody = const CustRecvView();
+                            Navigator.of(context).pop();
+                          });
                     },
-                    //trailing: Icon(Icons.add),
                   ),
+                  /*********** 입고현황 메뉴  ***********/
                   ListTile(
                     leading: Icon(
                       Icons.stacked_bar_chart,
