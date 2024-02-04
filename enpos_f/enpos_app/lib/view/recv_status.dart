@@ -1,17 +1,16 @@
 import "package:enpos_app/provider/notice_provider.dart";
 import "package:flutter/material.dart";
 import "package:provider/provider.dart";
-import 'package:intl/intl.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import "../model/notice.dart";
 
 ScrollController scrollController = ScrollController();
 
-class NoticeView extends StatefulWidget {
-  const NoticeView({super.key});
+class RecvStatView extends StatefulWidget {
+  const RecvStatView({super.key});
 
   @override
-  State<NoticeView> createState() => _NoticeViewState();
+  State<RecvStatView> createState() => _RecvStatViewState();
 }
 
 class ItemWidget extends StatelessWidget {
@@ -38,13 +37,9 @@ class ItemWidget extends StatelessWidget {
   }
 }
 
-class _NoticeViewState extends State<NoticeView> {
+class _RecvStatViewState extends State<RecvStatView> {
   final _searchDates = ['1개월', '2개월', '3개월', '사용자설정'];
   String _searchDate= '';
-
-
-
-
 
   @override
   void initState() {
@@ -74,16 +69,10 @@ class _NoticeViewState extends State<NoticeView> {
                       ))
                           .toList(),
                       onChanged: (value) { // items 의 DropdownMenuItem 의 value 반환
-                        showDatePickerPop();
-                        // setState(() {
-                        //   _searchDate = value!;
-                        //   showDatePickerPop();
-                        // });
+                        setState(() {
+                          _searchDate = value!;
+                        });
                       }),
-
-
-
-
               centerTitle: true,
               elevation: 0.0,
 
@@ -122,27 +111,7 @@ class _NoticeViewState extends State<NoticeView> {
 
 
     );
-  }
-
-
-
-  /**********************************************************************
-      DatePicker 팝업
-   **********************************************************************/
-    void  showDatePickerPop() {
-      var date;
-      final selectedDate =  showDatePicker(
-        context: context,
-        initialDate: date,
-        firstDate: DateTime(2000),
-        lastDate: DateTime.now(),
-      );
-      if (selectedDate != null) {
-        setState(() {
-          date = selectedDate;
-        });
-      }
-    }
+}
   /**********************************************************************
             공지사항 상세 팝업
             1. 제목

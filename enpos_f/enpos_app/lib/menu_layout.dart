@@ -3,6 +3,7 @@ import 'package:enpos_app/provider/notice_provider.dart';
 import 'package:enpos_app/view/album_view.dart';
 import 'package:enpos_app/view/center_stock.dart';
 import 'package:enpos_app/view/cust_recv.dart';
+import 'package:enpos_app/view/recv_status.dart';
 import 'package:enpos_app/view/notice_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -192,11 +193,7 @@ class _MenuLayoutState extends State<MenuLayout> {
                     onTap: () {
                       setState(() {
                         menuText = "입고현황";
-                        //widgetForBody =  BodyWidget(mid:'1', notifyParent: () { _getNewList('2'); },);
-                        // widgetForBody = ChangeNotifierProvider<AlbumProvider>(
-                        //   create: (context) => AlbumProvider(),
-                        //   child: const AlbumView(),
-                        // );
+                        widgetForBody = const RecvStatView();
                         Navigator.of(context).pop();
                       });
                     },

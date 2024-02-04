@@ -14,13 +14,13 @@ class CenterStorckView extends StatefulWidget {
 
 
 /*
-  `     # 기존 API 연결 정보
+  `     # [센터입고] 기존 API 연결 정보
         1. 스캔된 번호로 정보 가져오는 API
           참고 front js : pages > goods-recv > goods-recv.ts
           참고 호출 js  : src> providers > goods-recv-data.ts
                          this.http.get(this.commData.getBaseURL() + '/gr/item?companyId=' + this.commData.getUserInfo().companyId + '&huNo=' + huNo)
 
-        2. 스캔된 번호로 정보 가져오는 API
+        2. 입고 내역 저장 Post API
 
  */
 
