@@ -2,6 +2,7 @@ import "package:enpos_app/provider/notice_provider.dart";
 import "package:flutter/material.dart";
 import "package:provider/provider.dart";
 import 'package:intl/intl.dart';
+import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import "../model/notice.dart";
 
@@ -41,16 +42,16 @@ class ItemWidget extends StatelessWidget {
 class _NoticeViewState extends State<NoticeView> {
   final _searchDates = ['1개월', '2개월', '3개월', '사용자설정'];
   String _searchDate= '';
-
-
-
-
+  String _rkm_startDate = '';
+  String _rkm_endDate = '';
 
   @override
   void initState() {
     super.initState();
     setState(() {
       _searchDate =  '2개월';
+      _rkm_startDate =  '${DateFormat('yyyyMMdd').format(DateTime.now().subtract(const Duration(days: 60)))}';
+      _rkm_endDate =  '${DateFormat('yyyyMMdd').format(DateTime.now())}';
     });
   }
 
@@ -65,7 +66,6 @@ class _NoticeViewState extends State<NoticeView> {
             flexibleSpace:
                   /*********** 검색 날짜 지정 ***********/
                   DropdownButton (
-
                       value: _searchDate,
                       items: _searchDates
                           .map((e) => DropdownMenuItem(
@@ -74,25 +74,43 @@ class _NoticeViewState extends State<NoticeView> {
                       ))
                           .toList(),
                       onChanged: (value) { // items 의 DropdownMenuItem 의 value 반환
-                        showDatePickerPop();
-                        // setState(() {
-                        //   _searchDate = value!;
-                        //   showDatePickerPop();
-                        // });
+                        if ( value == '1개월') { // '2개월', '3개월', '사용자설정'
+                           setState(() {
+                             _searchDate = value!;
+                             _rkm_startDate =  '${DateFormat('yyyyMMdd').format(DateTime.now().subtract(const Duration(days: 30)))}';
+                             _rkm_endDate =  '${DateFormat('yyyyMMdd').format(DateTime.now())}';
+                           });
+                        } else if( value == '2개월'){
+                          setState(() {
+                            _searchDate = value!;
+                            _rkm_startDate =  '${DateFormat('yyyyMMdd').format(DateTime.now().subtract(const Duration(days: 60)))}';
+                            _rkm_endDate =  '${DateFormat('yyyyMMdd').format(DateTime.now())}';
+                          });
+                        } else if( value == '3개월') {
+                          setState(() {
+                            _searchDate = value!;
+                            _rkm_startDate =  '${DateFormat('yyyyMMdd').format(DateTime.now().subtract(const Duration(days: 90)))}';
+                            _rkm_endDate =  '${DateFormat('yyyyMMdd').format(DateTime.now())}';
+                          });
+                        } else if( value == '사용자설정'){
+                            showDatePickerPop().then((value) =>
+                                setState(() {
+                                  print ('시작 날짜' + value[0].toString() + '끝 날짜' + value[1].toString());
+                                  _rkm_startDate = value[0].toString();
+                                  _rkm_endDate =value[1].toString();
+                                }),
+                            );
+                        }
+
                       }),
-
-
-
-
               centerTitle: true,
               elevation: 0.0,
-
         ),
 
       body:
           Consumer<NoticeProvider>(
               builder: (context, provider, child) {
-                noticeList = provider.getNoticeList('20230101','20240130');
+                noticeList = provider.getNoticeList('${_rkm_startDate}','${_rkm_endDate}');
                 return ListView.builder(
                     itemCount: noticeList.length,
                     controller: scrollController,
@@ -125,24 +143,102 @@ class _NoticeViewState extends State<NoticeView> {
   }
 
 
-
   /**********************************************************************
       DatePicker 팝업
    **********************************************************************/
-    void  showDatePickerPop() {
-      var date;
-      final selectedDate =  showDatePicker(
-        context: context,
-        initialDate: date,
-        firstDate: DateTime(2000),
-        lastDate: DateTime.now(),
-      );
-      if (selectedDate != null) {
-        setState(() {
-          date = selectedDate;
-        });
-      }
+  Future  showDatePickerPop() {
+    String _selectedDate = '';
+    String _dateCount = '';
+    List<String> _range = [];
+    String _rangeCount = '';
+
+    void _onSelectionChanged(DateRangePickerSelectionChangedArgs args) {
+      /// The argument value will return the changed date as [DateTime] when the
+      /// widget [SfDateRangeSelectionMode] set as single.
+      ///
+      /// The argument value will return the changed dates as [List<DateTime>]
+      /// when the widget [SfDateRangeSelectionMode] set as multiple.
+      ///
+      /// The argument value will return the changed range as [PickerDateRange]
+      /// when the widget [SfDateRangeSelectionMode] set as range.
+      ///
+      /// The argument value will return the changed ranges as
+      /// [List<PickerDateRange] when the widget [SfDateRangeSelectionMode] set as
+      /// multi range.
+      // PickerDateRange#7d999(startDate: 2024-02-11 00:00:00.000, endDate: 2024-02-13 00:00:00.000)
+      setState(() {
+        if (args.value is PickerDateRange) {
+          // _range = '${DateFormat('dd/MM/yyyy').format(args.value.startDate)} -'
+          // // ignore: lines_longer_than_80_chars
+          //     ' ${DateFormat('dd/MM/yyyy').format(args.value.endDate ?? args.value.startDate)}';
+          //enpos API  파라미터 날짜 형식 yyyymmdd
+          _range.add('${DateFormat('yyyyMMdd').format(args.value.startDate)}');
+          _range.add('${DateFormat('yyyyMMdd').format(args.value.endDate ?? args.value.startDate)}');
+        } else if (args.value is DateTime) {
+          _selectedDate = args.value.toString();
+        } else if (args.value is List<DateTime>) {
+          _dateCount = args.value.length.toString();
+        } else {
+          _rangeCount = args.value.length.toString();
+        }
+      });
     }
+
+    return
+      showDialog(
+        context: context,
+        builder: (BuildContext context) => AlertDialog(
+          actions: [
+            ElevatedButton(
+                onPressed: () =>  Navigator.pop(context, _range),       // 선택된 Range 넘겨주기
+                child: const Text('선택')),
+            ElevatedButton(
+                onPressed: () => Navigator.of(context).pop(), child: const Text('닫기')),
+          ],
+          content:
+          Stack(
+              children: <Widget>[
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  top: 0,
+                  height: 80,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text('Selected date: $_selectedDate'),
+                      Text('Selected date count: $_dateCount'),
+                      Text('Selected range: $_range'),
+                      Text('Selected ranges count: $_rangeCount')
+                    ],
+                  ),
+                ),
+                Positioned(
+                  left: 0,
+                  top: 80,
+                  right: 0,
+                  bottom: 0,
+                  child: SfDateRangePicker(
+                    onSelectionChanged: _onSelectionChanged,
+                    selectionMode: DateRangePickerSelectionMode.range,
+                    initialSelectedRange: PickerDateRange(
+                        DateTime.now().subtract(const Duration(days: 4)),
+                        DateTime.now().add(const Duration(days: 3))),
+                  ),
+                )
+              ]
+          ),
+        ),
+
+      );
+
+  }
+
+
+
+
   /**********************************************************************
             공지사항 상세 팝업
             1. 제목
