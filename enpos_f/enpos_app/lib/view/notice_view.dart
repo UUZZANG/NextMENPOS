@@ -45,6 +45,7 @@ class _NoticeViewState extends State<NoticeView> {
   String _rkm_startDate = '';
   String _rkm_endDate = '';
 
+
   @override
   void initState() {
     super.initState();
@@ -55,12 +56,13 @@ class _NoticeViewState extends State<NoticeView> {
     });
   }
 
-  late List<Notice> noticeList;
-
+  late List<Notice> noticeList =[];
+  int _listCnt = 0;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+       //bottomNavigationBar : Text ('건수: ' + _listCnt.toString()),
         appBar: AppBar(
             automaticallyImplyLeading : false,
             flexibleSpace:
@@ -79,18 +81,21 @@ class _NoticeViewState extends State<NoticeView> {
                              _searchDate = value!;
                              _rkm_startDate =  '${DateFormat('yyyyMMdd').format(DateTime.now().subtract(const Duration(days: 30)))}';
                              _rkm_endDate =  '${DateFormat('yyyyMMdd').format(DateTime.now())}';
+                             _listCnt = noticeList.length;
                            });
                         } else if( value == '2개월'){
                           setState(() {
                             _searchDate = value!;
                             _rkm_startDate =  '${DateFormat('yyyyMMdd').format(DateTime.now().subtract(const Duration(days: 60)))}';
                             _rkm_endDate =  '${DateFormat('yyyyMMdd').format(DateTime.now())}';
+                            _listCnt = noticeList.length;
                           });
                         } else if( value == '3개월') {
                           setState(() {
                             _searchDate = value!;
                             _rkm_startDate =  '${DateFormat('yyyyMMdd').format(DateTime.now().subtract(const Duration(days: 90)))}';
                             _rkm_endDate =  '${DateFormat('yyyyMMdd').format(DateTime.now())}';
+                            _listCnt = noticeList.length;
                           });
                         } else if( value == '사용자설정'){
                             showDatePickerPop().then((value) =>
@@ -98,6 +103,7 @@ class _NoticeViewState extends State<NoticeView> {
                                   print ('시작 날짜' + value[0].toString() + '끝 날짜' + value[1].toString());
                                   _rkm_startDate = value[0].toString();
                                   _rkm_endDate =value[1].toString();
+                                  _listCnt = noticeList.length;
                                 }),
                             );
                         }
@@ -108,37 +114,43 @@ class _NoticeViewState extends State<NoticeView> {
         ),
 
       body:
-          Consumer<NoticeProvider>(
+          Consumer <NoticeProvider>(
               builder: (context, provider, child) {
                 noticeList = provider.getNoticeList('${_rkm_startDate}','${_rkm_endDate}');
-                return ListView.builder(
-                    itemCount: noticeList.length,
-                    controller: scrollController,
-                    itemBuilder: (context, index) {
-                      return InkWell(
-                        onTap: () {
-                          _showdialog(context, noticeList[index]);
-                        },
-                        child: ListTile(
-                          title: Card(
-                              color: Colors.amberAccent,
-                              shape :RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(0)),
-                              child: Text("${noticeList[index].title}",
-                                  style: const TextStyle(fontSize: 16),
-                                  overflow: TextOverflow.ellipsis)),
-                          // trailing: Icon(Icons.more_vert),
-                          // isThreeLine: true,
-                          subtitle: ItemWidget(text: "${noticeList[index].content}"),
+                return
 
-                        ),
-                      );
-                    }
-                );
+                  Column(
+                      children: [
+                          Expanded(  child:
+                                    ListView.builder(
+                                    itemCount: noticeList.length,
+                                        controller: scrollController,
+                                        itemBuilder: (context, index) {
+                                          return InkWell(
+                                            onTap: () {
+                                              _showdialog(context, noticeList[index]);
+                                            },
+                                            child: ListTile(
+                                              title: Card(
+                                                  color: Colors.amberAccent,
+                                                  shape :RoundedRectangleBorder(
+                                                      borderRadius: BorderRadius.circular(0)),
+                                                  child: Text("${noticeList[index].title}",
+                                                      style: const TextStyle(fontSize: 16),
+                                                      overflow: TextOverflow.ellipsis)),
+                                              // trailing: Icon(Icons.more_vert),
+                                              // isThreeLine: true,
+                                              subtitle: ItemWidget(text: "${noticeList[index].content}"),
+
+                                            ),
+                                          );
+                                        }
+                                    ),
+                          ),
+                        Text ('건수: ' + noticeList.length.toString()),
+                      ]
+                  );
               })
-
-
-
     );
   }
 
@@ -198,23 +210,23 @@ class _NoticeViewState extends State<NoticeView> {
           content:
           Stack(
               children: <Widget>[
-                Positioned(
-                  left: 0,
-                  right: 0,
-                  top: 0,
-                  height: 80,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Text('Selected date: $_selectedDate'),
-                      Text('Selected date count: $_dateCount'),
-                      Text('Selected range: $_range'),
-                      Text('Selected ranges count: $_rangeCount')
-                    ],
-                  ),
-                ),
+                // Positioned(
+                //   left: 0,
+                //   right: 0,
+                //   top: 0,
+                //   height: 80,
+                //   child: Column(
+                //     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                //     mainAxisSize: MainAxisSize.min,
+                //     crossAxisAlignment: CrossAxisAlignment.start,
+                //     children: <Widget>[
+                //       Text('Selected date: $_selectedDate'),
+                //       Text('Selected date count: $_dateCount'),
+                //       Text('Selected range: $_range'),
+                //       Text('Selected ranges count: $_rangeCount')
+                //     ],
+                //   ),
+                // ),
                 Positioned(
                   left: 0,
                   top: 80,
