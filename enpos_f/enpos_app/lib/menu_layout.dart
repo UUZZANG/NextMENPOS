@@ -1,5 +1,6 @@
 import 'package:enpos_app/provider/album_provider.dart';
 import 'package:enpos_app/provider/notice_provider.dart';
+import 'package:enpos_app/provider/recv_stat_provider.dart';
 import 'package:enpos_app/view/album_view.dart';
 import 'package:enpos_app/view/center_stock.dart';
 import 'package:enpos_app/view/cust_recv.dart';
@@ -86,6 +87,8 @@ class _MenuLayoutState extends State<MenuLayout> {
               actions: [
                 IconButton(
                   onPressed: () {
+                    // 자동로그인 'Y'면 pw 저장 , 아이디 저장여부 'Y' id 저장
+
                     storage.deleteAll();
                     Navigator.popUntil(context, ModalRoute.withName("/"));
                   },
@@ -178,7 +181,10 @@ class _MenuLayoutState extends State<MenuLayout> {
                         () {
                           setState(() {
                             menuText = "거래처입고";
-                            widgetForBody = const CustRecvView();
+                            widgetForBody =ChangeNotifierProvider<NoticeProvider>(
+                              create: (context) => NoticeProvider(),
+                              child: const NoticeView(),
+                            );
                             Navigator.of(context).pop();
                           });
                     },
@@ -193,7 +199,10 @@ class _MenuLayoutState extends State<MenuLayout> {
                     onTap: () {
                       setState(() {
                         menuText = "입고현황";
-                        widgetForBody = const RecvStatView();
+                        widgetForBody = ChangeNotifierProvider<RecvStatProvider>(
+                          create: (context) => RecvStatProvider(),
+                          child: const RecvStatView(),
+                        );
                         Navigator.of(context).pop();
                       });
                     },

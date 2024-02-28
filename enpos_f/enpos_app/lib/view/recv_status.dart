@@ -1,8 +1,8 @@
-import "package:enpos_app/provider/notice_provider.dart";
+import "package:enpos_app/provider/recv_stat_provider.dart";
 import "package:flutter/material.dart";
 import "package:provider/provider.dart";
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
-import "../model/notice.dart";
+import "../model/recv_stat.dart";
 
 ScrollController scrollController = ScrollController();
 
@@ -49,7 +49,7 @@ class _RecvStatViewState extends State<RecvStatView> {
     });
   }
 
-  late List<Notice> noticeList;
+  late List<RecvStat> noticeList;
 
 
   @override
@@ -79,9 +79,9 @@ class _RecvStatViewState extends State<RecvStatView> {
         ),
 
       body:
-          Consumer<NoticeProvider>(
+          Consumer<RecvStatProvider>(
               builder: (context, provider, child) {
-                noticeList = provider.getNoticeList('20230101','20240130');
+                noticeList = provider.getRecvStatList('20230101','20240130');
                 return ListView.builder(
                     itemCount: noticeList.length,
                     controller: scrollController,
@@ -120,11 +120,11 @@ class _RecvStatViewState extends State<RecvStatView> {
             4. 첨부파일
    **********************************************************************/
 
-  Future<dynamic> _showdialog( BuildContext context, Notice notice) {
+  Future<dynamic> _showdialog( BuildContext context, RecvStat recvStat) {
       return showDialog(
         context: context,
         builder: (BuildContext context) => AlertDialog(
-          title: Text("${notice.title}"),
+          title: Text("${recvStat.title}"),
           content:
           Container(
               color: Colors.transparent,
@@ -138,14 +138,14 @@ class _RecvStatViewState extends State<RecvStatView> {
                                 SizedBox(
                                     height: 400,
                                     child: SingleChildScrollView(
-                                        child: HtmlWidget("${notice.content}")
+                                        child: HtmlWidget("${recvStat.content}")
                                     )
                                 ),
                               ),
-                              Text("${notice.name}"),
-                              Text("${notice.registerDate}"),
+                              Text("${recvStat.name}"),
+                              Text("${recvStat.registerDate}"),
                               const Divider(color: Colors.black12, thickness: 1.0),
-                              Text("${notice.fileTag}")
+                              Text("${recvStat.fileTag}")
                           ],
                   )
 

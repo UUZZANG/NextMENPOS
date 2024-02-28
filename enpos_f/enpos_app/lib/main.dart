@@ -45,6 +45,7 @@ class _MainPageState extends State<MainPage> {
   static const storage = FlutterSecureStorage();
   Map<String, dynamic> userInfo = {};
   dynamic storedId;
+  dynamic storedPw;
 
   // 최초 로딩시 수행
   @override
@@ -56,18 +57,40 @@ class _MainPageState extends State<MainPage> {
     });
   }
 
-  // 로그인 정보 있는지 확인 후 없으면 로그인 아니면 홈으로 이동
+  // 세션 저장 값에 따라 화면에 표시 이후 이동
   _checkLogin() async {
-    dynamic storedId = await storage.read(key: "id") ?? '';
-    dynamic storedToken = await storage.read(key: "authToken") ?? '';
-    print ('storedId' +storedId);
-    setState(() {});
-    if (storedId != '') {
-      Navigator.of(context).push(
-          MaterialPageRoute(builder: (context) => MenuLayout(id: storedId)));
-    } else {
-      print('login required!');
-    }
+      var tmpAutoLogin   = await storage.read(key: "autoLogin") ?? '';
+      var tmpSaveId      = await storage.read(key: "saveId") ?? '';
+
+
+      if (tmpSaveId == 'Y') {
+        _saveId     = true;
+        storedId    = await storage.read(key: "id") ?? '';
+        usernameController.value = storedId;
+      } else {
+        _saveId = false;
+      }
+
+
+      if (tmpAutoLogin == 'Y') {
+        _autoLogin  = true;
+        storedPw    = await storage.read(key: "password") ?? '';
+        passwordController.value = storedPw;
+      } else {
+        _autoLogin = false;
+      }
+
+
+      print ('storedId' + storedId +'tmpAutoLogin : ' + tmpAutoLogin + 'tmpSaveId' + tmpSaveId );
+      setState(() {});
+
+      if (tmpAutoLogin == 'Y') {
+        if (await loginAction(storedId, storedPw) == true) {
+          Navigator.of(context).push(
+              MaterialPageRoute(
+                  builder: (context) => MenuLayout(id: storedId)));
+        }
+      }
   }
 
   // Login Action
@@ -85,10 +108,7 @@ class _MainPageState extends State<MainPage> {
 
     if (res.statusCode == 200) {
       if ( jsonDecode(res.body)['isFailed'] == false) {
-
-
         await storage.write( key: "authToken", value: jsonDecode(res.body)['authToken']);
-
         // 로그인 결과 이상이 없는 경우 사용자 정보를 서버로 부터 가져옴
         final res1 = await http.get(
             Uri.parse(
@@ -101,11 +121,11 @@ class _MainPageState extends State<MainPage> {
           String jsonData = res1.body;
           var myJson = jsonDecode(jsonData)['pin'];
           storedId = myJson;
+          //await storage.write(key: "saveId",    value: _saveId?'Y':'N');
+          //await storage.write(key: "autoLogin", value: _autoLogin?'Y':'N');
           await storage.write(key: "id", value: myJson);
           return true;
         }
-
-
       }
     } else {
       print('접속 실패');
@@ -183,6 +203,7 @@ class _MainPageState extends State<MainPage> {
                   child: Scaffold(
                     body: TextField(
                       controller: passwordController,
+                      obscureText: true,
                       decoration: const InputDecoration(
                         labelText: '패스워드를 입력하세요',
                       ),
@@ -207,6 +228,10 @@ class _MainPageState extends State<MainPage> {
                           value: _saveId,
                           onChanged: (value) {
                             setState(() {
+                              if (!value) {
+                                // 자동로그인  disable
+                                _autoLogin = false;
+                              }
                               _saveId = value;
                             });
                           },
@@ -246,6 +271,10 @@ class _MainPageState extends State<MainPage> {
                           value: _autoLogin,
                           onChanged: (value) {
                             setState(() {
+                              if (value) {
+                                // 자동로그인 활성화시  Id 저장은 자동 활성화
+                                _saveId = true;
+                              }
                               _autoLogin = value;
                             });
                           },
@@ -279,10 +308,11 @@ class _MainPageState extends State<MainPage> {
                       ),
                       onPressed: () async {
                         if (await loginAction(usernameController.text,passwordController.text) == true) {
-
+                            await storage.write(key: "saveId",    value: _saveId?'Y':'N');
+                            await storage.write(key: "autoLogin", value: _autoLogin?'Y':'N');
+                            await storage.write(key: "password", value: passwordController.text);
                             Navigator.of(context).push(MaterialPageRoute(
                                 builder: (context) => MenuLayout(id: storedId)));
-
 
                         } else {
                           print('로그인 실패');
